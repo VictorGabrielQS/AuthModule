@@ -12,7 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@PasswordMatches
 public class RegisterRequest {
+
+        @NotBlank(message = "O nome é obrigatório")
+        private String username;
 
         @NotBlank(message = "O e-mail é obrigatório")
         @Email(message = "Formato de e-mail inválido")
@@ -22,6 +26,6 @@ public class RegisterRequest {
         private String password;
 
         @NotBlank(message = "A confirmação de senha é obrigatória")
-        private String passwordAgain;
+        private String confirmPassword;
 
 }

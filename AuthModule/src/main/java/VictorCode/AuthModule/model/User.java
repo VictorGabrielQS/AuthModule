@@ -21,7 +21,7 @@ public class User {
     private long id;
 
     @NotBlank
-    private String name;
+    private String username;
 
     @NotBlank
     @Email
