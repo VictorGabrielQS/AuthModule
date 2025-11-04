@@ -31,7 +31,9 @@ public class User {
     @NotBlank
     private String password;
 
-    @Enumerated(EnumType.STRING)
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
     private Role role;
 
 }
