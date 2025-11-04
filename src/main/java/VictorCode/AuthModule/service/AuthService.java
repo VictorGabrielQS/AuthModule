@@ -1,5 +1,6 @@
 package VictorCode.AuthModule.service;
 
+import VictorCode.AuthModule.dto.LoginRequest;
 import VictorCode.AuthModule.dto.RegisterRequest;
 import VictorCode.AuthModule.model.Role;
 import VictorCode.AuthModule.model.User;
@@ -34,7 +35,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Role 'ROLE_USER' não encontrada"));
 
         User user = new User();
-        user.setUsername(registerRequest.getUsername());
+        user.setName(registerRequest.getName());
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setRole(userRole);
@@ -43,4 +44,17 @@ public class AuthService {
     }
 
     // 🔐 Login e geração do token JWT
+    public String login(LoginRequest loginRequest){
+        User user = userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
+            throw new RuntimeException("Senha incorreta");
+        }
+
+        // Gera o token JWT
+        return  jwtTokenProvider.generateToken(user.getName());
+    }
+
+
 }

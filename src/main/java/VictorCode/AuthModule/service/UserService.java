@@ -62,7 +62,7 @@ public class UserService {
         User user = userRepository.findById(id)
                         .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        user.setUsername(userData.getUsername());
+        user.setName(userData.getName());
         user.setEmail(userData.getEmail());
         return userRepository.save(userData);
     }
