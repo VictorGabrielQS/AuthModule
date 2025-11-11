@@ -11,8 +11,7 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "password_reset_tokens",
-        indexes = @Index(columnList = "token"))
+@Table(name = "password_reset_tokens")
 public class PasswordResetToken {
 
     @Id

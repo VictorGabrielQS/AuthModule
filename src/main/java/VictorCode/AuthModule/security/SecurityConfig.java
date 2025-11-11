@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // desativa CSRF em APIs REST
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT é stateless
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**")
+                        .requestMatchers("/api/auth/**",  "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                         .permitAll() // login e registro são públicos
                         .anyRequest()
                         .authenticated() // o resto precisa de token
