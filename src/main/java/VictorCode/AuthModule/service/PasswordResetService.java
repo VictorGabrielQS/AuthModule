@@ -5,6 +5,7 @@ import VictorCode.AuthModule.model.User;
 import VictorCode.AuthModule.repository.PasswordResetTokenRepository;
 import VictorCode.AuthModule.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
+
 @Service
+
 public class PasswordResetService {
 
     private final UserRepository userRepository;
@@ -32,17 +35,12 @@ public class PasswordResetService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-
-    public PasswordResetService(UserRepository userRepository,
-                                PasswordResetTokenRepository tokenRepository,
-                                JavaMailSender mailSender,
-                                PasswordEncoder passwordEncoder) {
+    public PasswordResetService(UserRepository userRepository, PasswordResetTokenRepository tokenRepository, JavaMailSender mailSender, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.mailSender = mailSender;
         this.passwordEncoder = passwordEncoder;
     }
-
 
 
     // Cria token e envia e-mail com link.

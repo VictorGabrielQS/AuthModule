@@ -1,7 +1,9 @@
 package VictorCode.AuthModule.service;
 
 
+import VictorCode.AuthModule.model.Role;
 import VictorCode.AuthModule.model.User;
+import VictorCode.AuthModule.repository.RoleRepository;
 import VictorCode.AuthModule.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,10 +16,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
-    public UserService(UserRepository userRepository , PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository , PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
     }
 
 
@@ -51,7 +55,13 @@ public class UserService {
 
         // Criptografa a senha antes de salvar
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Role 'ROLE_USER' não encontrada"));
+        user.setRole(userRole);
+
         return userRepository.save(user);
+
 
     }
 
@@ -64,6 +74,8 @@ public class UserService {
 
         user.setName(userData.getName());
         user.setEmail(userData.getEmail());
+        user.setRole(userData.getRole());
+
         return userRepository.save(userData);
     }
 
