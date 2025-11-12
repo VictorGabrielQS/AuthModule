@@ -25,4 +25,6 @@ public class PasswordResetController {
         return ResponseEntity.ok("Email de redefinição de senha enviado para: " + emailRequest.getEmail());
     }
 
+
+    @PostMapping("/")
 }
