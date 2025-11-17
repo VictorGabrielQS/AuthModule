@@ -15,17 +15,27 @@ import lombok.NoArgsConstructor;
 @PasswordMatches
 public class RegisterRequest {
 
-        @NotBlank(message = "O nome é obrigatório")
-        private String name;
+    @NotBlank(message = "O nome é obrigatório")
+    private String name;
 
-        @NotBlank(message = "O e-mail é obrigatório")
-        @Email(message = "Formato de e-mail inválido")
-        private String email;
+    @NotBlank(message = "O e-mail é obrigatório")
+    @Email(message = "Formato de e-mail inválido")
+    private String email;
 
-        @NotBlank(message = "A senha é obrigatória")
-        private String password;
+    @NotBlank(message = "Numero de telefone obrigatório")
+    private String phoneNumber;
 
-        @NotBlank(message = "A confirmação de senha é obrigatória")
-        private String confirmPassword;
+    @NotBlank(message = "A senha é obrigatória")
+    private String password;
+
+    @NotBlank(message = "A confirmação de senha é obrigatória")
+    private String confirmPassword;
+
+    @NotBlank(message = "O tipo de conta é obrigatório")
+    private String accountType; // "personal" ou "aluno"
+
+    private boolean receiveUpdates; // true se o usuário marcar o checkbox
+
+
 
 }

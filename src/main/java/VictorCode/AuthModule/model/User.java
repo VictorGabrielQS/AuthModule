@@ -30,7 +30,15 @@ public class User {
     private String email;
 
     @NotBlank
+    private String phoneNumber;
+
+
+    @NotBlank
     private String password;
+
+    @Column(name = "receive_updates")
+    private boolean receiveUpdates;
+
 
 
     @ManyToOne(fetch = FetchType.EAGER)

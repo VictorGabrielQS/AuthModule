@@ -2,6 +2,7 @@ package VictorCode.AuthModule.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -30,35 +31,65 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
         String token = null;
         String username = null;
 
-        // O token vem no formato: "Bearer eyJhbGciOiJIUzI1..."
-        if (header != null && header.startsWith("Bearer ")) {
-            token = header.substring(7);
-            username = jwtTokenProvider.getUsernameFromToken(token);
-        }
-
-        // Autentica o usuário se o token for válido e ainda não estiver autenticado
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            if (jwtTokenProvider.validateToken(token)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // Define o usuário autenticado no contexto
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+        // Pega token do cookie "token"
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("token".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
             }
         }
 
-        // Segue o fluxo normal
+        // Se não veio no cookie, tenta pegar do header Authorization
+        if (token == null) {
+            String header = request.getHeader("Authorization");
+            if (header != null && header.startsWith("Bearer ")) {
+                token = header.substring(7);
+            }
+        }
+
+        if (token != null) {
+            try {
+                username = jwtTokenProvider.getUsernameFromToken(token);
+
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                    if (jwtTokenProvider.validateToken(token)) {
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
+                }
+            } catch (io.jsonwebtoken.ExpiredJwtException ex) {
+                // Token expirado: limpa contexto e cookie
+                SecurityContextHolder.clearContext();
+                if (request.getCookies() != null) {
+                    for (Cookie cookie : request.getCookies()) {
+                        if ("token".equals(cookie.getName())) {
+                            cookie.setMaxAge(0);
+                            cookie.setValue("");
+                            cookie.setPath("/"); // importante para remover corretamente
+                            response.addCookie(cookie);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                // Outros erros (usuário não encontrado, token inválido, etc.)
+                SecurityContextHolder.clearContext();
+            }
+        }
+
         filterChain.doFilter(request, response);
     }
-
 
 }
 

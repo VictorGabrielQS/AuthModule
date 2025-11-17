@@ -49,6 +49,11 @@ public class UserService {
             throw new IllegalArgumentException("Senha é obrigatória!");
         }
 
+        if (user.getPhoneNumber() == null || user.getPhoneNumber().isEmpty()){
+            throw new IllegalArgumentException("Numero de Telefone é obrigatória!");
+        }
+
+
         if (userRepository.existsByEmail(user.getEmail())){
             throw new RuntimeException("Email já está em uso!");
         }

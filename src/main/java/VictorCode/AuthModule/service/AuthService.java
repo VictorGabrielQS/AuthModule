@@ -26,22 +26,31 @@ public class AuthService {
     }
 
     // 🧾 Registrar novo usuário
-    public User register(RegisterRequest registerRequest){
-        if (userRepository.existsByEmail(registerRequest.getEmail())){
-            throw new RuntimeException("Email ja Cadastrado!");
+    public User register(RegisterRequest registerRequest) {
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new RuntimeException("Email já cadastrado!");
         }
 
-        Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new RuntimeException("Role 'ROLE_USER' não encontrada"));
+
+
+
+        // Determina a role com base no tipo de conta
+        String roleName = registerRequest.getAccountType().equals("personal") ? "ROLE_PERSONAL" : "ROLE_ALUNO";
+
+        Role userRole = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role '" + roleName + "' não encontrada"));
 
         User user = new User();
         user.setName(registerRequest.getName());
         user.setEmail(registerRequest.getEmail());
+        user.setPhoneNumber(registerRequest.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setRole(userRole);
+        user.setReceiveUpdates(registerRequest.isReceiveUpdates());
 
         return userRepository.save(user);
     }
+
 
     // 🔐 Login e geração do token JWT
     public String login(LoginRequest loginRequest){
